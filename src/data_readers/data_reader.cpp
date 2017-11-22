@@ -387,9 +387,9 @@ bool lbann::generic_data_reader::loadFromCheckpointShared(persist& p, const char
 
     // record minibatch index
     uint64_t val;
-    //snprintf(fieldname, sizeof(fieldname), "%s_current_mini_batch_idx", name);
-    //p.read_uint64(persist_type::train, fieldname, &val);
-    //m_current_mini_batch_idx = (int) val;
+    snprintf(fieldname, sizeof(fieldname), "%s_current_mini_batch_idx", name);
+    p.read_uint64(persist_type::train, fieldname, &val);
+    m_current_mini_batch_idx = (int) val;
    
     snprintf(fieldname, sizeof(fieldname), "%s_data_size", name);
     p.read_uint64(persist_type::train, fieldname, &val);
@@ -447,7 +447,7 @@ bool lbann::generic_data_reader::loadFromCheckpointShared(persist& p, const char
   }
 
   // broadcast minibatch index
-  //MPI_Bcast(&m_current_mini_batch_idx, 1, MPI_INT, 0, MPI_COMM_WORLD);
+  MPI_Bcast(&m_current_mini_batch_idx, 1, MPI_INT, 0, MPI_COMM_WORLD);
 
   //MPI_Bcast(&m_stride_to_last_mini_batch, 1, MPI_INT, 0, MPI_COMM_WORLD);
   //MPI_Bcast(&m_stride_to_next_mini_batch, 1, MPI_INT, 0, MPI_COMM_WORLD);
@@ -475,6 +475,7 @@ bool lbann::generic_data_reader::loadFromCheckpointShared(persist& p, const char
 
   // broadcast index array
   MPI_Bcast(&m_shuffled_indices[0], size, MPI_INT, 0, MPI_COMM_WORLD);
+  this->set_shuffled_indices(&m_shuffled_indices[0]);
   return true;
 }
 
