@@ -615,7 +615,7 @@ void Layer::check_setup() {}
 
 bool Layer::saveToCheckpoint(int fd, const char *filename, size_t *bytes) const {
   //writeDist(fd, filename, *m_weights, bytes);
-
+  
   // Need to catch return value from function
   // m_optimizer->saveToCheckpoint(fd, filename, bytes);
   return true;
@@ -631,6 +631,7 @@ bool Layer::loadFromCheckpoint(int fd, const char *filename, size_t *bytes) {
 }
 
 bool Layer::saveToCheckpointShared(persist& p) const {
+  //char l_name[512];
   return true;
 }
 

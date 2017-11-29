@@ -169,10 +169,9 @@ bool sequential_model::load_from_file(const string file_dir) {
     printf("Loaded parameters from %s (%f secs)\n", dir, secs);
     fflush(stdout);
   }
-
   return true;
 }
-
+#endif
 bool sequential_model::save_to_checkpoint(int fd, const char *filename, size_t *bytes) {
   // write number of layers (we'll check this on read)
   int layers = m_layers.size();
@@ -236,13 +235,12 @@ bool sequential_model::save_to_checkpoint_shared(persist& p) {
 
     // TODO: record each layer type and size (to be checked when read back)
   }
-
   // write out details for each layer
-  for (size_t l = 0; l < m_layers.size(); l++) {
+  /*for (size_t l = 0; l < m_layers.size(); l++) {
     if (! m_layers[l]->saveToCheckpointShared(p)) {
       return false;
     }
-  }
+  }*/
 
   return true;
 }
@@ -271,14 +269,13 @@ bool sequential_model::load_from_checkpoint_shared(persist& p) {
   // TODO: check that each layer type matches what we'd expect
 
   // read in each layer
-  for (size_t l = 0; l < m_layers.size(); l++) {
+  /*for (size_t l = 0; l < m_layers.size(); l++) {
     if (! m_layers[l]->loadFromCheckpointShared(p)) {
       return false;
     }
-  }
+  }*/
 
   return true;
 }
-#endif // 0
 
 }  // namespace lbann

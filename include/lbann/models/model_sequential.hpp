@@ -89,7 +89,7 @@ class sequential_model : public model {
   /// Load model from file
   /** @todo This is old and likely broken */
   bool load_from_file(const std::string file_dir);
-
+#endif
   /// Save model to checkpoint
   /** @todo This is old and likely broken */
   bool save_to_checkpoint(int fd, const char *filename, size_t *bytes);
@@ -99,7 +99,7 @@ class sequential_model : public model {
 
   bool save_to_checkpoint_shared(persist& p) override;
   bool load_from_checkpoint_shared(persist& p) override;
-#endif // 0
+//#endif // 0
 
 };
 
