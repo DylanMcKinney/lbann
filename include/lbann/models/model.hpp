@@ -209,7 +209,8 @@ class model {
     return true;
   }
   /** Returns true if a checkpoint should be taken, false otherwise */
-  bool need_checkpoint();
+
+ // bool need_checkpoint();
 
   /** Checkpoint model to given file descriptor, return number of bytes written */
   virtual bool save_to_checkpoint_shared(persist& p);
@@ -218,11 +219,11 @@ class model {
 
   /*! Top-level call to start checkpoint.  This creates the persist object
    *  and then calls the model's save_to_checkpoint_shared() virtual function */
-  bool checkpointShared();
+  //bool checkpointShared();
 
   /*! Top-level call to restart.  This creates the persist object
    *  and then calls the model's load_from_checkpoint_shared() virtual function */
-  bool restartShared();
+  //bool restartShared();
 
 //#endif // 0
 

@@ -471,9 +471,9 @@ void model::train(int num_epochs) {
 
     // Finish epoch
     do_epoch_end_cbs();
-    if(need_checkpoint()){
-      checkpointShared();
-    }
+    //if(need_checkpoint()){
+    //  checkpointShared();
+    //}
   }
   do_train_end_cbs();
 }
@@ -802,7 +802,7 @@ void model::summarize_matrices(lbann_summary& summarizer) {
 ////////////////////////////////////////////////////////////
 // Checkpointing
 ////////////////////////////////////////////////////////////
-
+#if 0 
 
 /** \brief Returns true if a checkpoint should be taken, false otherwise */
 bool model::need_checkpoint() {
@@ -1045,6 +1045,8 @@ bool model::restartShared() {
 
   return true;
 }
+
+#endif
 /* struct used to serialize mode fields in file and MPI transfer */
 struct lbann_model_header {
   uint32_t execution_mode;
