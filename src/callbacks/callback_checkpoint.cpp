@@ -36,16 +36,15 @@ void lbann_callback_checkpoint::setup(model *m) {
 }
 
 void lbann_callback_checkpoint::on_epoch_end(model *m) {
+  m_epoch_end = true; 
   if(need_checkpoint(m)){
     checkpointShared(m);
   }
 }
 
 void lbann_callback_checkpoint::on_batch_end(model *m) {
-  if(m_checkpoint_epochs == 0){
-    if(need_checkpoint(m)){
-      checkpointShared(m);
-    }
+  if(need_checkpoint(m)){
+    checkpointShared(m);
   }
 }
 bool lbann_callback_checkpoint::need_checkpoint(model *m) {
@@ -62,7 +61,7 @@ bool lbann_callback_checkpoint::need_checkpoint(model *m) {
   lbann_comm *comm = m->get_comm();
   // if at start of epoch and evenly divide
   if (flag == 0 && m_checkpoint_epochs > 0) {
-    if (at_epoch_start()) {
+    if (m_epoch_end) {
       flag = (int) (m->get_cur_epoch() % m_checkpoint_epochs == 0);
     }
   }
@@ -86,6 +85,7 @@ bool lbann_callback_checkpoint::need_checkpoint(model *m) {
     // get flag from rank 0
     MPI_Bcast(&flag, 1, MPI_INT, 0, MPI_COMM_WORLD);
   }
+  m_epoch_end = false;
   return (bool)flag;
 }
 

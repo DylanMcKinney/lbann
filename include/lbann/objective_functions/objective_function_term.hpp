@@ -69,6 +69,9 @@ class objective_function_term {
    */
   virtual void compute_gradient() = 0;
 
+  virtual bool saveToCheckpointShared(lbann::persist& p);
+  virtual bool loadFromCheckpointShared(lbann::persist& p);
+  
   objective_function* get_objective_function() { return m_objective_function; }
   void set_objective_function(objective_function* obj_fn) { m_objective_function = obj_fn; }
 

@@ -237,14 +237,24 @@ bool sequential_model::save_to_checkpoint_shared(persist& p) {
   }
   // write out details for each layer
   
-  for (weights *w : m_weights) {
-    w->saveToCheckpointShared(p);
-  }
-
-  for (size_t l = 0; l < m_layers.size(); l++) {
-    if (! m_layers[l]->saveToCheckpointShared(p)) {
+  //for (weights *w : m_weights) {
+  //  w->saveToCheckpointShared(p);
+  //}
+  int i = 0;
+  char l_name[512];
+  for (Layer * layer : m_layers) {
+    if (! layer ->saveToCheckpointShared(p)) {
       return false;
     }
+    std::string layer_name = layer->get_type();
+    printf("%s\n", layer_name.c_str());
+    printf("%lu\n", layer_name.length());
+    sprintf(l_name, "layer_%d_size", i);
+    p.write_uint64(persist_type::model, l_name, (uint64_t) layer_name.length());
+    
+    sprintf(l_name, "layer_%d_name", i);
+    p.write_bytes(persist_type::model, l_name, &layer_name, layer_name.length());
+    i++; 
   }
 
   return true;
@@ -257,8 +267,24 @@ bool sequential_model::load_from_checkpoint_shared(persist& p) {
   // have rank 0 read the network file
   struct lbann_model_sequential_header header;
   if (p.get_rank() == 0) {
+    char l_name[512];
+    //uint64_t val;
+    //std::string layer_name;
+    //std::vector<std::string> layer_names;
     p.read_uint32(persist_type::model, "layers", &header.layers);
-
+    for(int i = 0; i < (int) header.layers; i++){
+      uint64_t val; 
+      sprintf(l_name, "layer_%d_size", i);
+      printf("%s\n", l_name);
+      p.read_uint64(persist_type::model, l_name, &val);
+      int size = (int) val;
+      printf("%d\n", size);
+      //sprintf(l_name, "layer_%d_name", i);
+      //p.read_bytes(persist_type::model, l_name, &layer_name[0], size);
+      //layer_names.push_back(layer_name); 
+      //printf("%s\n", layer_name.c_str());
+      //layer_name.clear();
+    }
     // TODO: read back each layer type and size
   }
 
@@ -272,9 +298,9 @@ bool sequential_model::load_from_checkpoint_shared(persist& p) {
   }
 
   // TODO: check that each layer type matches what we'd expect
-  for (weights *w : m_weights) {
-    w->loadFromCheckpointShared(p);
-  }
+  //for (weights *w : m_weights) {
+  //  w->loadFromCheckpointShared(p);
+  //}
   // read in each layer
   for (size_t l = 0; l < m_layers.size(); l++) {
     if (! m_layers[l]->loadFromCheckpointShared(p)) {
