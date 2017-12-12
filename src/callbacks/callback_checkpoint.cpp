@@ -244,41 +244,4 @@ bool lbann_callback_checkpoint::restartShared(model *m) {
   return true;
 }
 
-bool lbann_callback_checkpoint::savePerRank(model *m){
- /* if (m_checkpoint_dir.length() == 0) {
-    return false;
-  }
-  // time how long this takes
-  El::Timer timer;
-  lbann_comm *comm = m->get_comm();
-  // get checkpoint directory
-  const char *dir = m_checkpoint_dir.c_str();
-  // read current epoch and step counters from model
-  int epoch = m->get_cur_epoch();
-  int step  = m->get_cur_step();
-  // let user know we're saving a checkpoint
-  MPI_Barrier(MPI_COMM_WORLD);
-  if (comm->am_world_master()) {
-    timer.Start();
-    printf("Checkpoint: epoch %d step %d ...\n", epoch, step);
-    fflush(stdout);
-  }
-  // create top level directory
-  //const char* dir = trainParams.ParameterDir.c_str();
-  makedir(dir);
-  char epochdir[1024];
-  snprintf(epochdir, sizeof(epochdir), "%s/shared.epoch.%d.step.%d", dir, epoch, step);
-  makedir(epochdir);
-  strcpy(m_checkpoint_dir, epochdir);
-  
-  */
-  return true;
-}
-
-bool lbann_callback_checkpoint::loadPerRank(model *m){
-  return true;
-}
-
-
-
 }

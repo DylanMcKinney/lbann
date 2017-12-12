@@ -410,8 +410,8 @@ bool lbann::persist::write_uint64(persist_type type, const char *name, uint64_t 
 bool lbann::persist::read_uint64(persist_type type, const char *name, uint64_t *val) {
   return read_bytes(type, name, val, sizeof(uint64_t));
 }
-// Test per rank
-bool lbann::persist::write_uint64_per_rank(persist_type type, const char *name, uint64_t val) {
+// First (wrong) hack at per file. works but not ideal. not deleting for now
+/*bool lbann::persist::write_uint64_per_rank(persist_type type, const char *name, uint64_t val) {
   int size = sizeof(uint64_t);
   char rank[24]; 
   sprintf(rank,"_%d",this->get_rank());  
@@ -528,7 +528,7 @@ bool lbann::persist::read_int32_contig_per_rank(persist_type type, const char *n
   }
   lbann::closeread(m_rank_fd,filename.c_str());
   return true;
-}
+}*/
 
 
 bool lbann::persist::write_int32_contig(persist_type type, const char *name, const int32_t *buf, uint64_t count) {

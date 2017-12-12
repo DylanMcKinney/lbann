@@ -78,8 +78,6 @@ class lbann_callback_checkpoint : public lbann_callback {
   bool need_checkpoint(model *m);
   bool checkpointShared(model *m);
   bool restartShared(model *m);
-  bool savePerRank(model *m);
-  bool loadPerRank(model *m);
   std::string name() const override { return "checkpoint"; }
  protected:
   std::string m_checkpoint_dir;
