@@ -98,6 +98,22 @@ class objective_function {
     m_gradient_time = 0.0;
   }
 
+  bool saveToCheckpointShared(lbann::persist& p); //{
+    //for (objective_function_term* term : m_terms) {
+    //  term->get_objective_function()->saveToCheckpointShared(p);
+    //}
+    //return true;
+
+  //}
+
+  bool loadFromCheckpointShared(lbann::persist& p);// {
+    //for (objective_function_term* term : m_terms) {
+    //  term->get_objective_function()->loadFromCheckpointShared(p);
+    //}
+
+   //return true;
+   //}
+
  private:
 
   /** Pointer to model that owns this objective function. */
