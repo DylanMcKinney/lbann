@@ -67,7 +67,7 @@ bool lbann_callback_checkpoint::need_checkpoint(model *m) {
   }
   // if our current step is evenly divisable by checkpoint steps,
   // take a checkpoint
-  if (flag == 0 && m_checkpoint_steps > 0) {
+  if (flag == 0 && m_checkpoint_steps > 0 && m->get_cur_step() != 0) {
     flag = (int) (m->get_cur_step() % m_checkpoint_steps == 0);
   }
   // check the clock if time-based checkpoint is enabled
