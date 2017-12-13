@@ -165,8 +165,8 @@ class metric {
 //************************************************************************
 // Checkpointing
 //************************************************************************
-  bool save_to_checkpoint_shared(persist& p);
-  bool load_from_checkpoint_shared(persist& p);
+  virtual bool save_to_checkpoint_shared(persist& p);
+  virtual bool load_from_checkpoint_shared(persist& p);
 };
 
 }  // namespace metrics
