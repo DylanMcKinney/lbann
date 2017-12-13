@@ -238,15 +238,15 @@ bool sequential_model::save_to_checkpoint_shared(persist& p) {
   // write out details for each layer
 
   for (weights *w : m_weights) {
-    w->saveToCheckpointShared(p);
+    w->save_to_checkpoint_shared(p);
   }
 
   for (size_t l = 0; l < m_layers.size(); l++) {
-    if (! m_layers[l]->saveToCheckpointShared(p)) {
+    if (! m_layers[l]->save_to_checkpoint_shared(p)) {
       return false;
     }
   }
-  //m_objective_function->saveToCheckpointShared(p);
+  //m_objective_function->save_to_checkpoint_shared(p);
   return true;
 }
 
@@ -273,15 +273,15 @@ bool sequential_model::load_from_checkpoint_shared(persist& p) {
 
   // TODO: check that each layer type matches what we'd expect
   for (weights *w : m_weights) {
-    w->loadFromCheckpointShared(p);
+    w->load_from_checkpoint_shared(p);
   }
   // read in each layer
   for (size_t l = 0; l < m_layers.size(); l++) {
-    if (! m_layers[l]->loadFromCheckpointShared(p)) {
+    if (! m_layers[l]->load_from_checkpoint_shared(p)) {
       return false;
     }
   }
-  //m_objective_function->loadFromCheckpointShared(p);
+  //m_objective_function->load_from_checkpoint_shared(p);
   return true;
 }
 

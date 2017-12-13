@@ -127,8 +127,8 @@ class weights {
   std::vector<DataType*> get_values_gpu();
 #endif // __LIB_CUDNN
 
-  bool saveToCheckpointShared(persist& p);
-  bool loadFromCheckpointShared(persist& p);
+  bool save_to_checkpoint_shared(persist& p);
+  bool load_from_checkpoint_shared(persist& p);
  protected:
 
   /** Weights name.

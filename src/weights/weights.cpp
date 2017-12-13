@@ -313,7 +313,7 @@ std::vector<DataType*> weights::get_values_gpu() {
 }
 #endif // __LIB_CUDN
 
-bool weights::saveToCheckpointShared(lbann::persist& p)
+bool weights::save_to_checkpoint_shared(lbann::persist& p)
 {
   // define name to store our parameters
   char l_name[512];
@@ -328,7 +328,7 @@ bool weights::saveToCheckpointShared(lbann::persist& p)
   return true;
 }
 
-bool weights::loadFromCheckpointShared(lbann::persist& p)
+bool weights::load_from_checkpoint_shared(lbann::persist& p)
 {
   // define name to store our parameters
   char l_name[512], f_name[512];
