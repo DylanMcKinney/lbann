@@ -439,9 +439,13 @@ void model::train(int num_epochs) {
 
     // Initialize model for beginning of training epoch
     set_execution_mode(execution_mode::training);
-    m_objective_function->clear_history();
-    for (auto&& m : m_metrics) {
-      m->reset_metric();
+
+    // At the start of the epoch, clean up the objective function and metrics
+    if(get_cur_step() == 0) {
+      m_objective_function->clear_history();
+      for (auto&& m : m_metrics) {
+        m->reset_metric();
+      }
     }
 
     // Start epoch
