@@ -64,6 +64,36 @@ void metric::reset_metric() {
   stats->reset_stats();
 }
 
+//************************************************************************
+// Checkpointing
+//************************************************************************
+bool metric::save_to_checkpoint_shared(persist& p) {
+  // write out fields we need to save for model
+  if (p.get_rank() == 0) {
+    m_training_stats.pack_scalars(p);
+    m_validation_stats.pack_scalars(p);
+    m_testing_stats.pack_scalars(p);
+  }
+  return true;
+}
+
+bool metric::load_from_checkpoint_shared(persist& p) {
+  struct statistics::packing_header training_header, validation_header, testing_header;
+  if (p.get_rank() == 0) {
+    m_training_stats.unpack_scalars(p, &training_header);
+    m_validation_stats.unpack_scalars(p, &validation_header);
+    m_testing_stats.unpack_scalars(p, &testing_header);
+  }
+
+  MPI_Bcast(&training_header, sizeof(training_header), MPI_BYTE, 0, MPI_COMM_WORLD);
+  MPI_Bcast(&validation_header, sizeof(validation_header), MPI_BYTE, 0, MPI_COMM_WORLD);
+  MPI_Bcast(&testing_header, sizeof(testing_header), MPI_BYTE, 0, MPI_COMM_WORLD);
+
+  m_training_stats.unpack_header(training_header);
+  m_validation_stats.unpack_header(validation_header);
+  m_testing_stats.unpack_header(testing_header);
+  return true;
+}
 }  // namespace metrics
 
 }  // namespace lbann

@@ -30,6 +30,7 @@
 #include "lbann/base.hpp"
 #include "lbann/comm.hpp"
 #include "lbann/utils/exception.hpp"
+#include "lbann/io/persist.hpp"
 
 namespace lbann {
 
@@ -61,6 +62,52 @@ class statistics {
 
   double m_total_error = 0.0;
   long m_total_num_samples = 0;
+
+//************************************************************************
+// Checkpointing
+//************************************************************************
+  /* struct used to serialize mode fields in file and MPI transfer */
+  struct packing_header {
+    double error_per_epoch;
+    uint64_t samples_per_epoch;
+    uint64_t iterations_per_epoch;
+    double total_error;
+    uint64_t total_num_samples;
+  };
+
+  bool pack_scalars(persist& p) {
+    p.write_double(persist_type::train, "error_per_epoch",      m_error_per_epoch);
+    p.write_uint64(persist_type::train, "samples_per_epoch",    (uint64_t) m_samples_per_epoch);
+    p.write_uint64(persist_type::train, "iterations_per_epoch", (uint64_t) m_iterations_per_epoch);
+    p.write_double(persist_type::train, "total_error",          m_total_error);
+    p.write_uint64(persist_type::train, "total_num_samples",    (uint64_t) m_total_num_samples);
+    return true;
+  }
+
+  bool unpack_scalars(persist& p, struct packing_header *header) {
+    p.read_double(persist_type::train, "error_per_epoch",      &m_error_per_epoch);
+    p.read_uint64(persist_type::train, "samples_per_epoch",    (uint64_t *) &m_samples_per_epoch);
+    p.read_uint64(persist_type::train, "iterations_per_epoch", (uint64_t *) &m_iterations_per_epoch);
+    p.read_double(persist_type::train, "total_error",          &m_total_error);
+    p.read_uint64(persist_type::train, "total_num_samples",    (uint64_t *) &m_total_num_samples);
+
+    if(header != nullptr) {
+      header->error_per_epoch = m_error_per_epoch;
+      header->samples_per_epoch = (uint64_t) m_samples_per_epoch;
+      header->iterations_per_epoch = (uint64_t) m_iterations_per_epoch;
+      header->total_error = m_total_error;
+      header->total_num_samples = (uint64_t) m_total_num_samples;
+    }
+    return true;
+  }
+
+  void unpack_header(struct packing_header& header) {
+    m_error_per_epoch = header.error_per_epoch;
+    m_samples_per_epoch = (long) header.samples_per_epoch;
+    m_iterations_per_epoch = (long) header.iterations_per_epoch;
+    m_total_error = header.total_error;
+    m_total_num_samples = (long) header.total_num_samples;
+  }
 };
 
 /**
@@ -114,6 +161,12 @@ class metric {
 
  public:
   model *m_neural_network_model;
+
+//************************************************************************
+// Checkpointing
+//************************************************************************
+  bool save_to_checkpoint_shared(persist& p);
+  bool load_from_checkpoint_shared(persist& p);
 };
 
 }  // namespace metrics
