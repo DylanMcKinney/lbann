@@ -29,7 +29,7 @@
 #include "lbann/lbann.hpp"
 #include "lbann/proto/proto_common.hpp"
 #include "lbann/utils/protobuf_utils.hpp"
-
+#include <dirent.h>
 using namespace lbann;
 
 const int lbann_default_random_seed = 42;
@@ -66,10 +66,35 @@ int main(int argc, char *argv[]) {
     if (pbs.size() > 1) {
       model_2 = build_model_from_prototext(argc, argv, *(pbs[1]));
     }
+    // Begin experimental weight load
+    if(opts->has_string("ckpt_dir")){
 
+      std::string ckpt_dir = opts->get_string("ckpt_dir");
+      std::vector<std::string> weight_list = std::vector<std::string>();
+      DIR *weight_dir;
+      struct dirent *weight_file;
+      if((weight_dir = opendir(ckpt_dir.c_str())) == NULL)
+      {
+        std::cout << "error opening " << ckpt_dir << "\n";
+        return false;
+      }
+      while ((weight_file = readdir(weight_dir)) != NULL){
+        if(!strncmp(weight_file->d_name,"model_weights_",14))
+       
+          weight_list.push_back(std::string(weight_file->d_name));
+      }
+      closedir(weight_dir);
+      const auto layers1 = model_1->get_layers(); 
+      for(size_t l1=0; l1 < layers1.size(); l1++) {
+        layers1[l1]->load_from_save(ckpt_dir,weight_list);
+      }
+
+    }
     // Train model
     if (master)  std::cerr << "\nSTARTING train - model 1\n\n";
     const lbann_data::Model pb_model = pbs[0]->model();
+    
+
     model_1->train( pb_model.num_epochs() );
     model_1->evaluate(execution_mode::testing);
 
