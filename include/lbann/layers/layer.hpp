@@ -309,8 +309,6 @@ class Layer {
   /** Replace weights with another Layer's weights*/
   void replace_weights(Layer* other_layer);
 
-  bool load_from_save(std::string ckpt_dir,std::vector<std::string> weight_list);
-
   /** Get previous activation tensor. */
   AbsDistMat& get_prev_activations(int parent_index = 0);
   /** Get activation tensor. */

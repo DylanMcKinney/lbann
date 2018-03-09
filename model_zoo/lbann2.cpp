@@ -71,11 +71,29 @@ int main(int argc, char *argv[]) {
 
       std::string ckpt_dir = opts->get_string("ckpt_dir");
       std::vector<std::string> weight_list = std::vector<std::string>();
+      int epochLast = -1;
+      int stepLast = -1;
+      // define filename
+      char latest[1024];
+      sprintf(latest, "%s/last.shared.checkpoint", ckpt_dir.c_str());
+      // open the file for reading
+      int fd = openread(latest);
+      if (fd != -1) {
+        // read epoch from file
+        char field[256];
+        read_string(fd, "shared.last", field, sizeof(field));
+        int ret = sscanf(field, "epoch=%d step=%d\n", &epochLast, &stepLast);
+        // close our file
+        closeread(fd, latest);
+        if(ret != 2) { return false; }
+      // shared.epoch.1.step.844
+        sprintf(latest, "%s/shared.epoch.%d.step.%d/", ckpt_dir.c_str() ,epochLast, stepLast);
+      }
       DIR *weight_dir;
       struct dirent *weight_file;
-      if((weight_dir = opendir(ckpt_dir.c_str())) == NULL)
+      if((weight_dir = opendir(latest)) == NULL)
       {
-        std::cout << "error opening " << ckpt_dir << "\n";
+        std::cout << "error opening " << latest << "\n";
         return false;
       }
       while ((weight_file = readdir(weight_dir)) != NULL){
@@ -84,9 +102,9 @@ int main(int argc, char *argv[]) {
           weight_list.push_back(std::string(weight_file->d_name));
       }
       closedir(weight_dir);
-      const auto layers1 = model_1->get_layers(); 
-      for(size_t l1=0; l1 < layers1.size(); l1++) {
-        layers1[l1]->load_from_save(ckpt_dir,weight_list);
+      //const auto weights = model_1->get_weights(); 
+      for(weights *w : model_1->get_weights()) {
+        w->load_from_save(latest,weight_list);
       }
 
     }

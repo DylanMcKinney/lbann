@@ -747,23 +747,6 @@ void Layer::replace_weights(Layer* other_layer) {
 
 }
 
-bool Layer::load_from_save(std::string ckpt_dir, std::vector<std::string> weight_list){
-
-  for (size_t i = 0; i < m_weights.size(); ++i) {
-    char l_name[1024];
-    sprintf(l_name, "model_weights_%s_%dx%d.bin", m_weights[i]->get_name().c_str(), m_weights[i]->get_matrix_height(), m_weights[i]->get_matrix_width());
-    std::vector<std::string>::iterator it;
-    it = find(weight_list.begin(),weight_list.end(),l_name);
-    auto pos = std::distance(weight_list.begin(),it);
-    if((unsigned) pos < weight_list.size()){
-      std::string full_path = ckpt_dir + weight_list[pos];
-      std::cout << "Loading " << m_weights[i]->get_name() << " for layer: " << m_name <<  "\n";
-      m_weights[i]->load_from_save(full_path);
-    }
-  }
-  return true;
-}
-
 void Layer::deallocate_matrices() {
 #ifdef LBANN_HAS_CUDNN
   // Deallocate GPU memory
