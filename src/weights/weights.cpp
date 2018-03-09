@@ -516,5 +516,9 @@ bool weights::load_from_checkpoint_shared(lbann::persist& p)
   return true;
 }
 
+bool weights::load_from_save(std::string full_path){
+  El::Read(*m_values,full_path, El::BINARY, true);
+  return true;
+}
 
 }  // namespace lbann
