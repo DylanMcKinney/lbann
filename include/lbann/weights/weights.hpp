@@ -189,9 +189,13 @@ class weights {
   std::vector<DataType*> get_values_gpu();
 #endif // LBANN_HAS_CUDNN
 
+  // For checkpointing
+  virtual void set_states_on_host();
+  virtual void set_states_on_device();
+  void synchronize();
   bool save_to_checkpoint_shared(persist& p);
   bool load_from_checkpoint_shared(persist& p);
-  
+  bool load_from_save(std::string ckpt_dir, std::vector<std::string> weight_list);
   /** Write weights to proto file */
   virtual void write_proto(lbann_data::Weights* proto) const;
  private:
