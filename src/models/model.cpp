@@ -982,6 +982,13 @@ bool model::save_to_checkpoint_shared(persist& p, bool val_end) {
     }
     
     for (weights *w : m_weights) {
+      w->set_states_on_host();
+    }
+    if (!m_weights.empty()) {
+      m_weights.at(0)->synchronize();
+    }
+
+    for (weights *w : m_weights) {
       w->save_to_checkpoint_shared(p);
     }
     for (size_t l = 0; l < m_layers.size(); l++) {
@@ -1044,6 +1051,7 @@ bool model::load_from_checkpoint_shared(persist& p) {
   //}
   for (weights *w : m_weights) {
     w->load_from_checkpoint_shared(p);
+    w->set_states_on_device(); // only if needed
   }
   // read in each layer
   for (size_t l = 0; l < m_layers.size(); l++) {
@@ -1051,6 +1059,10 @@ bool model::load_from_checkpoint_shared(persist& p) {
       return false;
     }
   }
+  if (!m_weights.empty()) {
+    m_weights.at(0)->synchronize();
+  }
+
   return true;
 }
 
