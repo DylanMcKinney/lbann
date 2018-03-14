@@ -450,6 +450,57 @@ std::string weights::get_dims_string(const std::vector<int>& matrix_height_dims,
   return ss.str();
 }
 
+/**
+ * Copies states from GPU to host only if the data is on GPU, which is done
+ * asynchronously. Thus, needs synchronization before accessing the states.
+ */
+void weights::set_states_on_host() {
+  get_values();
+  if (m_optimizer != nullptr) {
+    m_optimizer->set_states_on_host();
+  }
+}
+
+/**
+ * Copies states from host to GPU if the data has to be on GPU. This is done
+ * asynchronously. Thus, needs synchronization before accessing the states.
+ */
+void weights::set_states_on_device() {
+  // Check if states have been setup
+  if (m_values == nullptr) {
+    std::stringstream err;
+    err << __FILE__ << " " << __LINE__ << " :: "
+        << "attempted to access states before they are setup";
+    throw lbann_exception(err.str());
+  }
+
+  #ifdef LBANN_HAS_CUDNN
+  // Copy weights matrix to GPU if needed
+  if (m_cudnn != nullptr) {
+    if (m_values_d.empty() || m_values_d[0] == nullptr) {
+      std::stringstream err;
+      err << __FILE__ << " " << __LINE__ << " :: "
+          << "attempted to set state on device before they are setup";
+      throw lbann_exception(err.str());
+    }
+    m_cudnn->broadcast_to_gpus(m_values_d, m_values->Matrix());
+  }
+  #endif // LBANN_HAS_CUDNN
+
+  if (m_optimizer != nullptr) {
+    m_optimizer->set_states_on_device();
+  }
+}
+
+/// Synchronize with device streams
+void weights::synchronize() {
+  #ifdef LBANN_HAS_CUDNN
+  if (m_cudnn != nullptr) {
+    m_cudnn->synchronize(); // make sure if state copying is done
+  }
+  #endif // LBANN_HAS_CUDNN
+}
+
 bool weights::save_to_checkpoint_shared(lbann::persist& p)
 {
   // define name to store our parameters
@@ -460,7 +511,9 @@ bool weights::save_to_checkpoint_shared(lbann::persist& p)
   p.write_distmat(persist_type::model, l_name, (DistMat*)m_values);
   //
   // if saving training state, also write out state of optimizer
-  m_optimizer->save_to_checkpoint_shared(p, l_name);
+  if (m_optimizer != nullptr) {
+    m_optimizer->save_to_checkpoint_shared(p, l_name);
+  }
 
   return true;
 }
@@ -511,10 +564,26 @@ bool weights::load_from_checkpoint_shared(lbann::persist& p)
   p.read_distmat(persist_type::model, f_name, (DistMat*)m_values);
 
   // if loading training state, read in state of optimizer
-  m_optimizer->load_from_checkpoint_shared(p, l_name);
+  if (m_optimizer != nullptr) {
+    m_optimizer->load_from_checkpoint_shared(p, l_name);
+  }
 
   return true;
 }
 
+bool weights::load_from_save(std::string ckpt_dir, std::vector<std::string> weight_list){
+  //El::Read(*m_values,full_path, El::BINARY, true);
+  char l_name[1024];
+  sprintf(l_name, "model_weights_%s_%lldx%lld.bin", m_name.c_str(), m_values->Height(), m_values->Width());  
+  std::vector<std::string>::iterator it;
+  it = find(weight_list.begin(),weight_list.end(),l_name);
+  auto pos = std::distance(weight_list.begin(),it);
+  if((unsigned) pos < weight_list.size()){
+    std::string full_path = ckpt_dir + weight_list[pos];
+    std::cout << "Loading " << m_name <<  "\n";
+    El::Read(*m_values,full_path, El::BINARY, true);
+  }
+  return true;
+}
 
 }  // namespace lbann
