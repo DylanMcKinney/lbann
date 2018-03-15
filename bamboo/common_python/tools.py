@@ -17,7 +17,7 @@ def get_command(cluster, executable, num_nodes=None, partition=None,
                 exit_after_setup=False, mini_batch_size=None,
                 model_folder=None, model_name=None, model_path=None,
                 num_epochs=None, optimizer_name=None, optimizer_path=None,
-                processes_per_model=None, output_file_name=None,
+                processes_per_model=None, ckpt_dir=None, output_file_name=None,
                 return_tuple=False):
     # Check parameters for black-listed characters like semi-colons that
     # would terminate the command and allow for an extra command
@@ -145,6 +145,7 @@ def get_command(cluster, executable, num_nodes=None, partition=None,
         raise Exception('Unsupported Scheduler %s' % scheduler)
 
     # Create LBANN command
+    option_ckpt_dir = ''
     option_data_filedir = ''
     option_data_filedir_train = ''
     option_data_filename_train = ''
@@ -229,15 +230,18 @@ def get_command(cluster, executable, num_nodes=None, partition=None,
         option_num_epochs = ' --num_epochs=%d' % num_epochs
     if processes_per_model != None:
         option_processes_per_model = ' --procs_per_model=%d' % processes_per_model
+    if ckpt_dir != None:
+        option_ckpt_dir = ' --ckpt_dir=%s' % ckpt_dir    
     if lbann_errors != []:
         raise Exception('Invalid Usage: ' + ' , '.join(lbann_errors))
-    command_lbann = '%s%s%s%s%s%s%s%s%s%s%s%s%s%s' % (
-        executable, option_data_filedir, option_data_filedir_train,
-        option_data_filename_train, option_data_filedir_test,
-        option_data_filename_test, option_data_reader,
-        option_data_reader_percent, option_exit_after_setup,
-        option_mini_batch_size, option_model, option_num_epochs,
-        option_optimizer, option_processes_per_model)
+    command_lbann = '%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s' % (
+        executable, option_ckpt_dir, option_data_filedir,
+        option_data_filedir_train, option_data_filename_train, 
+        option_data_filedir_test, option_data_filename_test, 
+        option_data_reader, option_data_reader_percent, 
+        option_exit_after_setup, option_mini_batch_size, 
+        option_model, option_num_epochs, option_optimizer, 
+        option_processes_per_model)
 
     # Create output command
     command_output = ''
