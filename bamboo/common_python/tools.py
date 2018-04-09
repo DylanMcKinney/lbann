@@ -18,7 +18,7 @@ def get_command(cluster, executable, num_nodes=None, partition=None,
                 model_folder=None, model_name=None, model_path=None,
                 num_epochs=None, optimizer_name=None, optimizer_path=None,
                 processes_per_model=None, ckpt_dir=None, output_file_name=None,
-                return_tuple=False):
+                error_file_name=None, return_tuple=False):
     # Check parameters for black-listed characters like semi-colons that
     # would terminate the command and allow for an extra command
     blacklist = [';', '--']
