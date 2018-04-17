@@ -74,9 +74,15 @@ int main(int argc, char *argv[]) {
     if (master)  std::cerr << "\nSTARTING train - model 1\n\n";
     const lbann_data::Model pb_model = pbs[0]->model();
     
-
-    model_1->train( pb_model.num_epochs() );
-    model_1->evaluate(execution_mode::testing);
+    // When using checkpoint states, skip training as those could be the result
+    // of checkpointing by steps.
+    if (!opts->has_string("ckpt_dir")){
+      model_1->train( pb_model.num_epochs() );
+    }
+    // Evaluate model 1 unless it is set to skip
+    if (!opts->has_string("no_model1_eval")){
+      model_1->evaluate(execution_mode::testing);
+    }
 
     if (model_2 != nullptr) {
       const auto layers1 = model_1->get_layers();
