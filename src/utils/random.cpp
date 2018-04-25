@@ -70,6 +70,7 @@ rng_gen& get_data_seq_generator() {
   return ::data_seq_generator;
 }
 
+
 bool save_rng_to_checkpoint_shared(persist& p, const lbann_comm* comm) {
   std::string dirname = std::string(p.m_checkpoint_dir) + "/rng_state";
   makedir(dirname.c_str());
@@ -83,7 +84,6 @@ bool save_rng_to_checkpoint_shared(persist& p, const lbann_comm* comm) {
   std::ofstream rng_EL(rng_name);
   rng_EL << El::Generator();
 #endif
-
   std::string rank_in_world;
   if (comm == nullptr) {
     rank_in_world = std::to_string(El::mpi::Rank(El::mpi::COMM_WORLD));
@@ -116,7 +116,6 @@ bool save_rng_to_checkpoint_shared(persist& p, const lbann_comm* comm) {
 }
 
 bool load_rng_from_checkpoint_shared(persist& p, const lbann_comm* comm) {
-  
   std::string dirname = std::string(p.m_checkpoint_dir) + "/rng_state";
   std::string rng_name;
 
@@ -128,7 +127,6 @@ bool load_rng_from_checkpoint_shared(persist& p, const lbann_comm* comm) {
   std::ifstream rng_EL(rng_name);
   rng_EL >> El::Generator();
 #endif
-
   std::string rank_in_world;
   if (comm == nullptr) {
     rank_in_world = std::to_string(El::mpi::Rank(El::mpi::COMM_WORLD));

@@ -111,7 +111,9 @@ bool lbann_callback_checkpoint::need_checkpoint(model *m) {
       // determine whether it's time for a checkpoint
       m_checkpoint_shared = (current >= next);
     }
+
     comm->model_broadcast(0, m_checkpoint_shared);
+
   } 
   // If either checkpoint version is triggered, return true, otherwise false.   
   return (m_checkpoint_shared || m_checkpoint_dist);
@@ -177,6 +179,7 @@ bool lbann_callback_checkpoint::checkpoint(model *m) {
   int epoch = -1;
   int step = -1 ;
   lbann_comm *comm = m->get_comm();
+
   // TODO: we would want to prepend dir with the model name and model rank:
   // m->get_name() + '.' + std::to_string(comm->get_model_rank()) + '.'
   // However, rng state is not part of model state but that of the world.
@@ -184,12 +187,14 @@ bool lbann_callback_checkpoint::checkpoint(model *m) {
   comm->model_barrier();
   // let user know we're saving a checkpoint
   if (comm->am_model_master()) {
+
     epoch = m->get_cur_epoch();
     step = m->get_cur_step();
     timer.Start();
     printf("Checkpoint: epoch %d step %d ...\n", epoch, step);
     fflush(stdout);
   }
+
   comm->model_broadcast(0, epoch);
   comm->model_broadcast(0, step);
 
@@ -205,6 +210,7 @@ bool lbann_callback_checkpoint::checkpoint(model *m) {
     makedir(dir);
     // create directories per ranks
     snprintf(epochdir, sizeof(epochdir), "%s/rank.%d.epoch.%d.step.%d", dir, comm->get_rank_in_model(), epoch, step);
+
     p.open_checkpoint(epochdir);
     // Call top level save to checkpoint function in model, in turn calls save to checkpoint functions for other model classes (weights, layers)
     m->save_to_checkpoint_distributed(p);
@@ -219,6 +225,7 @@ bool lbann_callback_checkpoint::checkpoint(model *m) {
     strcpy(dir, m_checkpoint_dir.c_str());
     makedir(dir);
     snprintf(epochdir, sizeof(epochdir), "%s/shared.epoch.%d.step.%d", dir, epoch, step);
+
     if (comm->am_model_master()) {
       p.open_checkpoint(epochdir);
     }
@@ -235,6 +242,7 @@ bool lbann_callback_checkpoint::checkpoint(model *m) {
   uint64_t bytes_count = p.get_bytes();
 
   if (comm->am_model_master()) {
+
     EvalType secs = timer.Stop();
     EvalType bw = 0;
     if (secs > 0.0) {
@@ -265,6 +273,7 @@ bool lbann_callback_checkpoint::restart(model *m) {
   int shared = 1;
   // Grab latest checkpoint information, checks for latest in dist and shared, restarts from most recent between the two. 
   if (comm->am_model_master()) {
+
     if(m_per_rank_dir.length()){
       snprintf(dir, sizeof(dir), "%s/%s", m_per_rank_dir.c_str(), m_checkpoint_dir.c_str());
       read_latest(dir, "last.distributed.checkpoint", &epoch_dist, &step_dist);
@@ -319,6 +328,7 @@ bool lbann_callback_checkpoint::restart(model *m) {
   comm->model_broadcast(0, &(dir[0]), sizeof(dir));
 #endif
 
+
   // if we couldn't find the latest epoch, just return
   if (epoch < 0) {
     return false;
@@ -326,6 +336,7 @@ bool lbann_callback_checkpoint::restart(model *m) {
   // time how long this takes
   El::Timer timer;
   // let user know we're restarting from a checkpoint
+
   if (comm->am_model_master()) {
     timer.Start();
     printf("Restart: epoch %d ...\n", epoch);
@@ -337,6 +348,7 @@ bool lbann_callback_checkpoint::restart(model *m) {
   // Create dir to restart from based off last recorded checkpoint (or overriden values in last.shared[distributed].checkpoint
   if(!shared){
     snprintf(epochdir, sizeof(epochdir), "%s/rank.%d.epoch.%d.step.%d", dir, comm->get_rank_in_model(), epoch, step);
+
     p.open_restart(epochdir);
     m->load_from_checkpoint_distributed(p);
   }
@@ -347,6 +359,7 @@ bool lbann_callback_checkpoint::restart(model *m) {
     }
     // Ensure all ranks have access to checkpoint dir, needed for loading rank specific rng state
     comm->model_broadcast(0, &(p.m_checkpoint_dir[0]), sizeof(p.m_checkpoint_dir));
+
     m->load_from_checkpoint_shared(p);
   }
   
@@ -355,6 +368,7 @@ bool lbann_callback_checkpoint::restart(model *m) {
   uint64_t bytes_count = p.get_bytes();
   // let user know we've completed reading our restart
   if (comm->am_model_master()) {
+
     EvalType secs = timer.Stop();
     EvalType bw = 0.0;
     if (secs > 0.0) {

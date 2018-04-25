@@ -226,7 +226,6 @@ bool sgd::load_from_checkpoint_shared(persist& p, std::string name_prefix) {
   }
 
   m_comm->model_broadcast(0, header);
-
   unpack_header(header);
   char l_name[512];
   sprintf(l_name, "%s_optimizer_velocity_%lldx%lld.bin", name_prefix.c_str(), m_velocity->Height(), m_velocity->Width());

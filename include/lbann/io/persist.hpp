@@ -72,6 +72,15 @@ class persist {
     ckpt_type = type;
   }
 
+
+  callback_type get_cb_type() const {
+    return ckpt_type;
+  }
+
+  void set_cb_type(callback_type type){
+    ckpt_type = type;
+  }
+
   void open_checkpoint(const char *dir);
   void close_checkpoint();
 

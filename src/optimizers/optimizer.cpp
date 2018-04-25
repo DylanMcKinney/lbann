@@ -505,4 +505,14 @@ bool optimizer::load_from_checkpoint_distributed(persist& p, std::string m_name)
   p.read_datatype(persist_type::train, "learning_rate", &m_learning_rate);
   return true;
 }
+
+bool optimizer::save_to_checkpoint_distributed(persist& p, std::string m_name) {
+  p.write_datatype(persist_type::train, "learning_rate", m_learning_rate);
+  return true;
+}
+
+bool optimizer::load_from_checkpoint_distributed(persist& p, std::string m_name) {
+  p.read_datatype(persist_type::train, "learning_rate", &m_learning_rate);
+  return true;
+}
 }  // namespace lbann

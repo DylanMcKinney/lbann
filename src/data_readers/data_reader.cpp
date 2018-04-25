@@ -396,11 +396,10 @@ bool lbann::generic_data_reader::load_from_checkpoint_shared(persist& p, const c
   }
   m_comm->model_broadcast(0, header);
   unpack_header(header);
-
   m_comm->model_broadcast(0, m_shuffled_indices);
-
   // Adjust current position to deal with fact that it was just loaded to all ranks from rank 0 (differs by rank #)
   m_current_pos += m_comm->get_rank_in_model();
+
   return true;
 }
 

@@ -170,7 +170,7 @@ bool lbann::persist::read_rank_distmat(persist_type type, const char *name, AbsD
       }
       m_bytes += read_rc;
     } else {
-      for(El::Int j = 0; j < (int) localwidth; ++j) {
+      for(El::Int j = 0; j <  localwidth; ++j) {
         auto *buf = (void *) M.Buffer(0, j);
         El::Int bufsize = localheight * sizeof(DataType);
         read_rc = read(fd, buf, bufsize);
@@ -230,27 +230,29 @@ void lbann::persist::open_checkpoint(const char *dir) {
   strcpy(m_checkpoint_dir, dir);
 
   // open the file for writing
+  //else if(!per_rank && m_rank == 0) {
    sprintf(m_model_filename, "%s/model", dir);
 
   // define filename for train state
   sprintf(m_train_filename, "%s/train", dir);
     
   if(ckpt_type != callback_type::validation){
-    m_model_fd = lbann::openwrite(m_model_filename);
+    m_model_fd = openwrite(m_model_filename);
     if (m_model_fd < 0) {
-      // failed to open checkpoint file
+      throw lbann_exception(std::string("Failed to open file: ") + m_model_filename);
     } 
 
-    m_train_fd = lbann::openwrite(m_train_filename);
+    m_train_fd = openwrite(m_train_filename);
     if (m_train_fd < 0) {
-      // failed to open checkpoint file
+      throw lbann_exception(std::string("Failed to open file: ") + m_train_filename);
+
     }
   } 
   if (ckpt_type == callback_type::validation || ckpt_type == callback_type::batch){
     sprintf(m_validate_filename, "%s/validate", dir);
-    m_validate_fd = lbann::openwrite(m_validate_filename);
+    m_validate_fd = openwrite(m_validate_filename);
     if (m_validate_fd < 0) {
-      // failed to open checkpoint file    
+      throw lbann_exception(std::string("Failed to open file: ") + m_model_filename);
     }
   }
   //}
@@ -304,22 +306,15 @@ void lbann::persist::open_restart(const char *dir) {
 
 void lbann::persist::close_restart() {
   // close model file
-  if (m_model_fd >= 0) {
-    lbann::closeread(m_model_fd, m_model_filename);
-    m_model_fd = -1;
-  }
+  lbann::closeread(m_model_fd, m_model_filename);
+  m_model_fd = -1;
 
   // close training file
-  if (m_train_fd >= 0) {
-    lbann::closeread(m_train_fd, m_train_filename);
-    m_train_fd = -1;
-  }
-
-  if (m_validate_fd >= 0) {
-    lbann::closeread(m_validate_fd, m_validate_filename);
-    m_validate_fd = -1;
-  }
-
+  lbann::closeread(m_train_fd, m_train_filename);
+  m_train_fd = -1;
+  // close validate file
+  lbann::closeread(m_validate_fd, m_validate_filename);
+  m_validate_fd = -1;
 }
 
 bool lbann::persist::write_distmat(persist_type type, const char *name, AbsDistMat *M) {
@@ -390,8 +385,7 @@ bool lbann::persist::read_bytes(persist_type type, const char *name, void *buf, 
       return false;
     }
     m_bytes += size;
-  }
-  else{
+  } else {
     return false;
   } 
   return true;

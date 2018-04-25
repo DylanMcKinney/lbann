@@ -1153,7 +1153,6 @@ bool model::save_to_checkpoint_shared(persist& p) {
   // write out fields we need to save for model
   if (p.get_cb_type() != callback_type::validation) {
     if (m_comm->am_model_master()) {
-
       p.write_uint32(persist_type::train, "execution_mode",     (uint32_t) m_execution_mode);
       p.write_uint32(persist_type::train, "terminate_training", (uint32_t) m_terminate_training);
       p.write_uint64(persist_type::train, "current_epoch",      (uint64_t) m_current_epoch);
@@ -1187,8 +1186,7 @@ bool model::save_to_checkpoint_shared(persist& p) {
         m->save_to_checkpoint_shared(p);
       }
     }
-  }
-  else{ 
+  } else { 
     if (m_comm->am_model_master()) {
       p.write_uint64(persist_type::validate, "current_validataion_step",       (uint64_t) m_current_validation_step);
     }
@@ -1222,10 +1220,12 @@ bool model::load_from_checkpoint_shared(persist& p) {
     p.read_uint32(persist_type::train, "current_phase",      &header.current_phase);
     p.read_uint32(persist_type::train, "persist_callback_type",     &header.callback_type);
   }
+
   load_rng_from_checkpoint_shared(p, m_comm);
   // TODO: this assumes homogeneous processors
   // broadcast state from rank 0
   m_comm->model_broadcast(0, header);
+
   // set our member params from values read from disk
   m_execution_mode     = (execution_mode) header.execution_mode;
   m_terminate_training = (bool)           header.terminate_training;
@@ -1294,7 +1294,7 @@ bool model::save_to_checkpoint_distributed(persist& p){
   else {
     p.write_uint64(persist_type::validate, "current_validataion_step",       (uint64_t) m_current_validation_step);
     save_rng_to_checkpoint_shared(p, m_comm);
-    
+   
     for (size_t l = 0; l < m_layers.size(); l++) { 
       if (! m_layers[l]->save_to_checkpoint_distributed(p)) {
         return false;

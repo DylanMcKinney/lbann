@@ -691,7 +691,9 @@ class generic_input_layer : public io_layer {
     // rank 0 reads the file
     dataset_header header;
     // Assume we are loading from a epoch end checkpoint
+
     if (m_comm->am_model_master()) {
+
       p.read_uint64(persist_type::train, "reader_train_processed",    &header.train_proc);
       p.read_uint64(persist_type::train, "reader_train_total",        &header.train_total);
       p.read_uint64(persist_type::train, "reader_test_processed",     &header.test_proc);
