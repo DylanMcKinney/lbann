@@ -359,6 +359,29 @@ add_subdirectory(model_zoo)
 add_subdirectory(model_zoo/tests)
 add_subdirectory(tests)
 
+#find_package(SWIG REQUIRED)
+#INCLUDE(${SWIG_USE_FILE})
+#find_package(PythonLibs)
+#include_directories(${PYTHON_INCLUDE_PATH})
+#include_directories($<BUILD_INTERFACE:${CMAKE_BINARY_DIR}>
+#                    $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
+#                    $<INSTALL_INTERFACE:${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_INCLUDEDIR}>)
+#
+#set_source_files_properties(include/lbann/proto/factories.i PROPERTIES CPLUSPLUS ON)
+#set_source_files_properties(include/lbann/proto/factories.i PROPERTIES SWIG_FLAGS "-includeall")
+#SWIG_ADD_MODULE(factories python include/lbann/proto/factories.i include/lbann/proto/factories.hpp)
+#SWIG_LINK_LIBRARIES(factories ${PYTHON_LIBRARIES} liblbann)
+#set(PYTHON_EXECUTABLE "/usr/bin/python3")
+project(lbann_backend)
+add_subdirectory(keras/pybind11)
+pybind11_add_module(lbann_backend MODULE src/keras/lbann_backend.cpp)
+target_include_directories(lbann_backend PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}>
+  $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_INCLUDEDIR}>)
+
+target_link_libraries(lbann_backend PUBLIC ${HYDROGEN_LIBRARIES})
+target_link_libraries(lbann_backend PUBLIC lbann)
 ################################################################
 # Install LBANN
 ################################################################
@@ -393,10 +416,20 @@ install(
         "${PROJECT_SOURCE_DIR}/README.md"
   DESTINATION ${CMAKE_INSTALL_DOCDIR}
   )
-
+#get_property(SWIG_INCLUDES TARGET lbann PROPERTY INTERFACE_INCLUDE_DIRECTORIES)
 # Display all of the accumulated compiler definitions
 get_directory_property( DirDefs COMPILE_DEFINITIONS )
 
+#find_package(SWIG REQUIRED)
+#INCLUDE(${SWIG_USE_FILE})
+#find_package(PythonLibs)
+#include_directories(${PYTHON_INCLUDE_PATH})
+#include_directories(${SWIG_INCLUDES} ${HYDROGEN_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
+#set(CMAKE_SWIG_FLAGS "")
+#set_source_files_properties(include/lbann/proto/factories.i PROPERTIES CPLUSPLUS ON)
+##set_source_files_properties(include/lbann/proto/factories.i PROPERTIES SWIG_FLAGS "-includeall")
+#SWIG_ADD_MODULE(factories  python include/lbann/proto/factories.i) #include/lbann/proto/factories.hpp)
+#SWIG_LINK_LIBRARIES(factories ${PYTHON_LIBRARIES})
 ################################################################
 # Configuration summary
 ################################################################

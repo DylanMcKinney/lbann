@@ -142,6 +142,8 @@ lbann_comm* initialize(int& argc, char**& argv, int seed = -1);
 /** Finalize LBANN. */
 void finalize(lbann_comm* comm = nullptr);
 
+lbann_comm* lbannpy_init(int rand_seed=42);
+
 /*
  * endsWith: http://thispointer.com/c-how-to-check-if-a-string-ends-with-an-another-given-string/
  * Case Sensitive Implementation of endsWith()

@@ -107,6 +107,11 @@ class lbann_comm {
   lbann_comm& operator=(const lbann_comm&) = delete;
   ~lbann_comm();
 
+  
+  lbann_comm* py_init() {
+    auto* comm = new lbann_comm(0);
+    return comm;
+  }
   /**
    * Split communicators so each model has procs_per_model processes.
    * If you call this multiple times, it will invalidate existing grids

@@ -1,0 +1,116 @@
+model {
+  name: "sequential_model"
+  num_epochs: 12
+  data_layout: "data_parallel"
+  #disable_cuda: true
+  layer {
+    name: "data"
+    input {
+      io_buffer: "partitioned"
+    }
+  }
+  layer {
+    convolution {
+      num_dims: 2
+      has_vectors: true
+      num_output_channels: 32
+      conv_dims: "3 3"
+      conv_pads: "0 0"
+      conv_strides: "1 1"
+      has_bias: true
+    }
+  }
+  layer {
+    relu {
+    }
+  }
+  layer {
+    convolution {
+      num_dims: 2
+      has_vectors: true
+      num_output_channels: 64
+      conv_dims: "3 3"
+      conv_pads: "0 0"
+      conv_strides: "1 1"
+      has_bias: true
+    }
+  }
+  layer {
+    relu {
+    }
+  }
+  layer {
+    pooling {
+      num_dims: 2
+      has_vectors: true
+      pool_dims: "2 2"
+      pool_pads: "0 0"
+      pool_strides: "2 2"
+      pool_mode: "max"
+    }
+  }
+  layer {
+    dropout {
+      keep_prob: 0.25
+    }
+  }
+  layer {
+    reshape {
+      flatten: true
+    }
+  }
+  layer {
+    fully_connected {
+      num_neurons: 128
+      has_bias: true
+    }
+  }
+  layer {
+    relu {
+    }
+  }
+  layer {
+    dropout {
+      keep_prob: 0.5
+    }
+  }
+  layer {
+    fully_connected {
+      num_neurons: 10
+      has_bias: true
+    }
+  }
+  layer {
+    softmax {
+    }
+  }
+  layer {
+    parents: "layer12 data"
+    target {
+    }
+  }
+  mini_batch_size: 128
+  block_size: 256
+
+  callback { print {} }
+  callback { timer {} }
+   ###################################################
+  # Objective function
+  ###################################################
+
+  objective_function {
+    cross_entropy {}
+    l2_weight_regularization {
+      scale_factor: 1e-4
+    }
+  }
+
+  ###################################################
+  # Metrics
+  ###################################################
+
+  metric {
+    categorical_accuracy {}
+  }
+  
+}
