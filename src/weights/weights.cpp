@@ -275,6 +275,17 @@ const AbsDistMat& weights::get_values() const {
   return *m_values;
 }
 
+std::vector<DataType> weights::get_values_pybind(){
+  std::vector<DataType> weight_array;
+  int i, j;
+  for(i = 0; i < m_values->Height(); ++i){
+      for(j = 0; j < m_values->Width(); ++j){
+        weight_array.insert(weight_array.end(),m_values->Get(i,j));
+      }
+  }
+  return weight_array;
+}
+
 void weights::set_values(const AbsDistMat& values) {
   El::Copy(values, get_values());
 }
