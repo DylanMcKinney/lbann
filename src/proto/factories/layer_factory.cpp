@@ -167,7 +167,11 @@ Layer* construct_layer(lbann_comm* comm,
       }
       dims.push_back(dr->get_linearized_data_size());
     }
-    return new reshape_layer<layout, Dev>(comm, dims);
+    if (params.flatten()) {
+      dims.clear();
+      dims.push_back(-1);
+    }
+    return new reshape_layer<layout, Dev>(comm, dims.size(), dims.data());
   }
   if (proto_layer.has_sum()) {
     return new sum_layer<layout, Dev>(comm);

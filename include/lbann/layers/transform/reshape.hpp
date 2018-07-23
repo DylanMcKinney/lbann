@@ -49,6 +49,9 @@ protected:
 
   void setup_dims() override {
     transform_layer::setup_dims();
+    if(this->m_neuron_dims[0] == -1) {
+      std::vector<int> temp = get_prev_neuron_dims(); 
+      this->m_neuron_dims[0] = std::accumulate(std::begin(temp), std::end(temp), 1, std::multiplies<double>());
 
     const auto& input_dims = get_input_dims();
     auto output_dims = get_output_dims();
