@@ -169,13 +169,10 @@ public:
 
   /** Get the weight matrix. */
   AbsDistMat& get_values();
-<<<<<<< HEAD
   /** Get the weight matrix. */
-=======
   std::vector<DataType> get_values_pybind();
   
   /** Get the weight matrix (const). */
->>>>>>> 0d12096... very experimental weights as TF variables work (needs editting like what)
   const AbsDistMat& get_values() const;
   /** Set the weight matrix. */
   void set_values(const AbsDistMat& values);

@@ -372,16 +372,16 @@ add_subdirectory(tests)
 #SWIG_ADD_MODULE(factories python include/lbann/proto/factories.i include/lbann/proto/factories.hpp)
 #SWIG_LINK_LIBRARIES(factories ${PYTHON_LIBRARIES} liblbann)
 #set(PYTHON_EXECUTABLE "/usr/bin/python3")
-project(lbann_backend)
-add_subdirectory(keras/pybind11)
-pybind11_add_module(lbann_backend MODULE src/keras/lbann_backend.cpp)
-target_include_directories(lbann_backend PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}>
-  $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
-  $<INSTALL_INTERFACE:${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_INCLUDEDIR}>)
+#project(lbann_backend)
+#add_subdirectory(keras/pybind11)
+#pybind11_add_module(lbann_backend MODULE src/keras/lbann_backend.cpp)
+#target_include_directories(lbann_backend PUBLIC
+#  $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}>
+#  $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
+#  $<INSTALL_INTERFACE:${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_INCLUDEDIR}>)
 
-target_link_libraries(lbann_backend PUBLIC ${HYDROGEN_LIBRARIES})
-target_link_libraries(lbann_backend PUBLIC lbann)
+#target_link_libraries(lbann_backend PUBLIC ${HYDROGEN_LIBRARIES})
+#target_link_libraries(lbann_backend PUBLIC lbann)
 ################################################################
 # Install LBANN
 ################################################################
